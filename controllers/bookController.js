@@ -1,5 +1,5 @@
 // controllers/bookController.js
-import { generateStory } from "../services/huggingfaceService.js";
+import { generateStory, generateImage } from "../services/huggingfaceService.js";
 
 export const generateBook = async (req, res) => {
   try {
@@ -9,10 +9,15 @@ export const generateBook = async (req, res) => {
       return res.status(400).json({ error: "Prompt is required" });
     }
 
+    // 1. Generate story
     const story = await generateStory(prompt);
 
-    res.json({ story });
+    // 2. Generate image (based on story or prompt)
+    const image = await generateImage(`Children's story illustration: ${prompt}`);
+
+    res.json({ story, image });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error in generateBook:", error.message);
+    res.status(500).json({ error: "Failed to generate book." });
   }
 };
