@@ -10,7 +10,13 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 
+// Root route
+app.get("/", (req, res) => {
+  res.send("Backend API is running 🚀 Use /api/book");
+});
+
+// API routes
 app.use("/api/book", bookRoutes);
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
