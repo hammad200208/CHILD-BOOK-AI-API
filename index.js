@@ -4,17 +4,19 @@ console.log("DEBUG HF_API_KEY:", process.env.HF_API_KEY?.slice(0, 6));
 
 import express from "express";
 import cors from "cors";
-import mongoose from "mongoose";   // ⬅️ new
+import mongoose from "mongoose";
 import bookRoutes from "./routes/bookRoutes.js";
-import authRoutes from "./routes/authRoutes.js";  // ⬅️ new
+import authRoutes from "./routes/authRoutes.js";
 import connectDB from "./utils/db.js";
 
 const app = express();
+
+// Connect DB
 connectDB();
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 
-// ✅ MongoDB connection
+// ✅ MongoDB connection (fallback, in case connectDB doesn’t handle errors)
 mongoose
   .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("✅ MongoDB Connected"))
@@ -22,12 +24,12 @@ mongoose
 
 // Root route
 app.get("/", (req, res) => {
-  res.send("Backend API is running 🚀 Use /api/book or /api/auth");
+  res.send("🚀 Backend API is running! Use /api/book or /api/auth");
 });
 
-// API routes
+// Routes
 app.use("/api/book", bookRoutes);
-app.use("/api/auth", authRoutes);   // ⬅️ new
+app.use("/api/auth", authRoutes);
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
+// ✅ Export for Vercel
+export default app;
