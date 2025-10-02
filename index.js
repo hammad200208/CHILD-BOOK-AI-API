@@ -4,14 +4,13 @@ console.log("DEBUG HF_API_KEY:", process.env.HF_API_KEY?.slice(0, 6));
 
 import express from "express";
 import cors from "cors";
-import mongoose from "mongoose";
 import bookRoutes from "./routes/bookRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import connectDB from "./utils/db.js";
 
 const app = express();
 
-// ✅ Connect DB
+// ✅ Connect to MongoDB
 connectDB();
 
 // ✅ Allowed origins for frontend
@@ -22,8 +21,7 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, curl, Postman)
-    if (!origin) return callback(null, true);
+    if (!origin) return callback(null, true); // allow Postman / curl
     if (allowedOrigins.indexOf(origin) === -1) {
       const msg = `CORS blocked: ${origin} is not allowed.`;
       return callback(new Error(msg), false);
@@ -38,15 +36,6 @@ app.use(cors({
 // ✅ Middleware
 app.use(express.json({ limit: "10mb" }));
 
-// ✅ MongoDB connection fallback (if connectDB didn’t handle it)
-mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch((err) => console.error("❌ MongoDB Error:", err.message));
-
 // ✅ Root route
 app.get("/", (req, res) => {
   res.send("🚀 Backend API is running! Use /api/book or /api/auth");
@@ -58,3 +47,11 @@ app.use("/api/auth", authRoutes);
 
 // ✅ Export for Vercel
 export default app;
+
+// ✅ Local dev server
+if (process.env.NODE_ENV !== "production") {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running locally on http://localhost:${PORT}`);
+  });
+}

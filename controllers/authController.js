@@ -7,6 +7,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "supersecret"; // put in .env later
 // Register
 export const registerUser = async (req, res) => {
   try {
+    console.log("📥 Register Payload:", req.body);
     const { name, email, password, confirmPassword } = req.body;
 
     // Check all fields
@@ -37,6 +38,7 @@ export const registerUser = async (req, res) => {
 // Login
 export const loginUser = async (req, res) => {
   try {
+     console.log("📥 Login Payload:", req.body);
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
